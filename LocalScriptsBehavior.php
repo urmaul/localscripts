@@ -5,8 +5,8 @@
  */
 class LocalScriptsBehavior extends CBehavior
 {
-    public $jsDir  = '$js/';
-    public $cssDir = '$css/';
+    public $jsDir  = '$/js/';
+    public $cssDir = '$/css/';
     
     public function attach($owner)
     {
