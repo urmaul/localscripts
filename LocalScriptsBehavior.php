@@ -16,17 +16,31 @@ class LocalScriptsBehavior extends CBehavior
         $this->cssDir = $this->setupPrefix($this->cssDir);
     }
 
-
+    # Register file #
+    
+    /**
+     * Register script file from your javascripts folder.
+     * @param string $name
+     * @param integer $position
+     * @return CClientScript 
+     */
     public function registerLocalScript($name, $position=0)
     {
         return $this->getOwner()->registerScriptFile($this->jsDir . $name, $position);
     }
     
+    /**
+     * Register css file from your styles folder.
+     * @param string $name
+     * @param string $media
+     * @return CClientScript 
+     */
     public function registerLocalCss($name, $media='')
     {
         return $this->getOwner()->registerCssFile($this->cssDir . $name, $media);
     }
     
+    # Internal #
     
     private function setupPrefix($dir)
     {
