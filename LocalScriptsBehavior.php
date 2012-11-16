@@ -13,6 +13,9 @@ class LocalScriptsBehavior extends CBehavior
     
     public function attach($owner)
     {
+        if (YII_DEBUG && !$owner instanceof CClientScript)
+            throw new CException(__CLASS__ . ' owner must be an instance of CClientScript.');
+        
         parent::attach($owner);
         
         $this->jsDir  = $this->setupPrefix($this->jsDir);
