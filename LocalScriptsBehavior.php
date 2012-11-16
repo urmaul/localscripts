@@ -1,7 +1,10 @@
 <?php
 
 /**
+ * This behavior helps to load script files from scripts folder without entering
+ * directory prefixes every time.
  * @property CClientScript $owner
+ * @method CClientScript getOwner()
  */
 class LocalScriptsBehavior extends CBehavior
 {
@@ -42,6 +45,11 @@ class LocalScriptsBehavior extends CBehavior
     
     # Internal #
     
+    /**
+     * Replace prefix placeholders with calculated values.
+     * @param string $dir
+     * @return string 
+     */
     private function setupPrefix($dir)
     {
         if ($dir[0] == '$') {
