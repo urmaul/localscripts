@@ -11,6 +11,9 @@ class LocalScriptsBehavior extends CBehavior
     public $jsDir  = '$/js/';
     public $cssDir = '$/css/';
     
+    public $jsPath  = null;
+    public $cssPath = null;
+    
     public function attach($owner)
     {
         if (YII_DEBUG && !$owner instanceof CClientScript)
@@ -18,8 +21,8 @@ class LocalScriptsBehavior extends CBehavior
         
         parent::attach($owner);
         
-        $this->jsDir  = $this->setupPrefix($this->jsDir);
-        $this->cssDir = $this->setupPrefix($this->cssDir);
+        $this->jsDir  = $this->initPrefix($this->jsPath,  $this->jsDir);
+        $this->cssDir = $this->initPrefix($this->cssPath, $this->cssDir);
     }
 
     # Register file #
@@ -49,11 +52,29 @@ class LocalScriptsBehavior extends CBehavior
     # Internal #
     
     /**
+     * Initializes prefix value.
+     * @param string $path directory path alias.
+     * When defined - directory will be published using assetManager.
+     * @param string $dir directory url.
+     * When path is defined this value is ignored.
+     * @return string
+     */
+    private function initPrefix($path, $dir)
+    {
+        if ($path !== null) {
+            $path = Yii::getPathOfAlias($path);
+            return Yii::app()->getComponent('assetManager')->publish($path) . '/';
+
+        } else 
+            return $this->replacePlaceholders($dir);
+    }
+    
+    /**
      * Replace prefix placeholders with calculated values.
      * @param string $dir
      * @return string 
      */
-    private function setupPrefix($dir)
+    private function replacePlaceholders($dir)
     {
         if ($dir[0] == '$') {
             $dir = Yii::app()->baseUrl . substr($dir, 1);
