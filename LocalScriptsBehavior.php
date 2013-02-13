@@ -14,6 +14,8 @@ class LocalScriptsBehavior extends CBehavior
     public $jsPath  = null;
     public $cssPath = null;
     
+    public $hashByName = true;
+    
     public function attach($owner)
     {
         if (YII_DEBUG && !$owner instanceof CClientScript)
@@ -52,6 +54,17 @@ class LocalScriptsBehavior extends CBehavior
     # Internal #
     
     /**
+     * Calls assetManager to publish asset.
+     * @param string $path the asset (file or directory) to be published
+     * @return string an absolute URL to the published asset
+     */
+    protected function publish($path)
+    {
+        return Yii::app()->getComponent('assetManager')
+            ->publish($path, $this->hashByName);
+    }
+    
+    /**
      * Initializes prefix value.
      * @param string $path directory path alias.
      * When defined - directory will be published using assetManager.
@@ -63,7 +76,7 @@ class LocalScriptsBehavior extends CBehavior
     {
         if ($path !== null) {
             $path = Yii::getPathOfAlias($path);
-            return Yii::app()->getComponent('assetManager')->publish($path) . '/';
+            return $this->publish($path) . '/';
 
         } else 
             return $this->replacePlaceholders($dir);
