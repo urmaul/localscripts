@@ -14,6 +14,8 @@ class LocalScriptsBehavior extends CBehavior
     public $jsPath  = null;
     public $cssPath = null;
     
+    public $publish = false;
+    
     public $hashByName = true;
     
     public function attach($owner)
@@ -23,8 +25,8 @@ class LocalScriptsBehavior extends CBehavior
         
         parent::attach($owner);
         
-        $this->jsDir  = $this->initPrefix($this->jsPath,  $this->jsDir);
-        $this->cssDir = $this->initPrefix($this->cssPath, $this->cssDir);
+        $this->initPrefix($this->jsPath,  $this->jsDir);
+        $this->initPrefix($this->cssPath, $this->cssDir);
     }
 
     # Register file #
@@ -37,7 +39,11 @@ class LocalScriptsBehavior extends CBehavior
      */
     public function registerLocalScript($name, $position=0)
     {
-        return $this->getOwner()->registerScriptFile($this->jsDir . $name, $position);
+        $fileName = $this->publish
+            ? $this->publish($this->jsPath . $name)
+            : $this->jsDir . $name;
+        
+        return $this->getOwner()->registerScriptFile($fileName, $position);
     }
     
     /**
@@ -48,7 +54,11 @@ class LocalScriptsBehavior extends CBehavior
      */
     public function registerLocalCss($name, $media='')
     {
-        return $this->getOwner()->registerCssFile($this->cssDir . $name, $media);
+        $fileName = $this->publish
+            ? $this->publish($this->cssPath . $name)
+            : $this->cssDir . $name;
+        
+        return $this->getOwner()->registerCssFile($fileName, $media);
     }
     
     # Internal #
@@ -72,14 +82,17 @@ class LocalScriptsBehavior extends CBehavior
      * When path is defined this value is ignored.
      * @return string
      */
-    private function initPrefix($path, $dir)
+    private function initPrefix(&$path, &$dir)
     {
         if ($path !== null) {
-            $path = Yii::getPathOfAlias($path);
-            return $this->publish($path) . '/';
+            $path = Yii::getPathOfAlias($path) . '/';
+            $dir = $this->publish($path) . '/';
 
-        } else 
-            return $this->replacePlaceholders($dir);
+        } else {
+            if ($this->publish)
+                $path = $this->replacePathPlaceholders($dir);
+            $dir = $this->replacePlaceholders($dir);
+        }
     }
     
     /**
@@ -91,6 +104,20 @@ class LocalScriptsBehavior extends CBehavior
     {
         if ($dir[0] == '$') {
             $dir = Yii::app()->baseUrl . substr($dir, 1);
+        }
+        
+        return $dir;
+    }
+    
+    /**
+     * Replace prefix placeholders with calculated values.
+     * @param string $dir
+     * @return string 
+     */
+    private function replacePathPlaceholders($dir)
+    {
+        if ($dir[0] == '$') {
+            $dir = Yii::getPathOfAlias('webroot') . substr($dir, 1);
         }
         
         return $dir;
