@@ -16,7 +16,7 @@ class LocalScriptsBehavior extends CBehavior
     
     public $publish = false;
     
-    public $hashByName = true;
+    public $hashByName = false;
     
     public function attach($owner)
     {
