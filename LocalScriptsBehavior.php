@@ -16,6 +16,9 @@ class LocalScriptsBehavior extends CBehavior
     
     public $publish = false;
     
+    public $publishJs  = false;
+    public $publishCss = false;
+    
     public $hashByName = false;
     
     public function attach($owner)
@@ -24,6 +27,11 @@ class LocalScriptsBehavior extends CBehavior
             throw new CException(__CLASS__ . ' owner must be an instance of CClientScript.');
         
         parent::attach($owner);
+        
+        if ($this->publish) {
+            $this->publishJs  = true;
+            $this->publishCss = true;
+        }
         
         $this->initPrefix($this->jsPath,  $this->jsDir);
         $this->initPrefix($this->cssPath, $this->cssDir);
@@ -39,7 +47,7 @@ class LocalScriptsBehavior extends CBehavior
      */
     public function registerLocalScript($name, $position=0)
     {
-        $fileName = $this->publish
+        $fileName = $this->publishJs
             ? $this->publish($this->jsPath . $name)
             : $this->jsDir . $name;
         
@@ -54,7 +62,7 @@ class LocalScriptsBehavior extends CBehavior
      */
     public function registerLocalCss($name, $media='')
     {
-        $fileName = $this->publish
+        $fileName = $this->publishCss
             ? $this->publish($this->cssPath . $name)
             : $this->cssDir . $name;
         
@@ -89,8 +97,7 @@ class LocalScriptsBehavior extends CBehavior
             $dir = $this->publish($path) . '/';
 
         } else {
-            if ($this->publish)
-                $path = $this->replacePathPlaceholders($dir);
+            $path = $this->replacePathPlaceholders($dir);
             $dir = $this->replacePlaceholders($dir);
         }
     }
